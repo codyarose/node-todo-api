@@ -14,6 +14,7 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
+// POST /todos
 app.post('/todos', (req, res) => {
 	let todo = new Todo({
 		text: req.body.text
@@ -26,6 +27,7 @@ app.post('/todos', (req, res) => {
 	});
 });
 
+// GET /todos
 app.get('/todos', (req, res) => {
 	Todo.find().then((todos) => {
 		res.send({todos});
@@ -34,6 +36,7 @@ app.get('/todos', (req, res) => {
 	});
 });
 
+// GET /todos/:id
 app.get('/todos/:id', (req, res) => {
 	let id = req.params.id;
 
@@ -51,6 +54,7 @@ app.get('/todos/:id', (req, res) => {
 	});
 });
 
+// DELETE /todos/:id
 app.delete('/todos/:id', (req, res) => {
 	let id = req.params.id;
 
@@ -69,6 +73,7 @@ app.delete('/todos/:id', (req, res) => {
 	});
 });
 
+// PATCH /todos/:id
 app.patch('/todos/:id', (req, res) => {
 	let id = req.params.id;
 	// A subset of the things the user passed to us
@@ -93,6 +98,20 @@ app.patch('/todos/:id', (req, res) => {
 		res.send({todo});
 	}).catch((e) => {
 		res.status(400).send();
+	});
+});
+
+// POST /users
+app.post('/users', (req, res) => {
+	let body = _.pick(req.body, ['email', 'password']);
+	let user = new User(body);
+
+	user.save().then(() => {
+		return user.generateAuthToken();
+	}).then((token) => {
+		res.header('x-auth', token).send(user);
+	}).catch((e) => {
+		res.status(400).send(e)
 	});
 });
 
